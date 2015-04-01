@@ -1,130 +1,204 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
-<head>
-    <meta charset="UTF-8">
-    <title>pong.html</title>
-    <script type="text/javascript"
-            src = "simpleGame.js"></script>
-    <script type="text/javascript">
-    var scene;
-    var ball;
-    var paddlePlayer;
-    var paddleComp;
-    var joy = new Joy();
-    
-    function Ball(){
-        //class definition for ball
-        tBall = new Sprite(scene, "redBall.png", 20, 20);
-        
-        tBall.checkBounce = function(paddle){
-            //responds to a collision with the given paddle
-            //Max and min dy 
-            MAX = 10
-            if (this.collidesWith(paddle)){
-                this.setDX(this.dx * -1);            
-            
-                dy = this.y - paddle.y;
-                dy = ((dy / paddle.height) * 2);
-                //console.log("dy: " + dy);
-                dy *= MAX;
-                this.setDY(dy);
-            } // end if
-        } // end checkBounce
+    <head>
+        <meta charset="UTF-8">
+        <title>pong.html</title>
+        <script type="text/javascript"
+        src = "simpleGame.js"></script>
+        <script type="text/javascript">
+            var scene;
+            var ball;
+            var paddlePlayer;
+            var paddleComp;
+            var difficultyChoice = 0; // 0 = easy | 1 = medium | 2 = hard | 3 = insane
+            var numberOfLivesChoice = 0; // 0 = 0 | 1 = 3 | 2 = 5
+            var backgroundChoice = 0; //0 = black | 1 = sand | 2 = snow
+            var background;
+            var joy = new Joy();
 
-        tBall.checkBounds = function(){
-            //overwrite checkbounds function to give
-            //custom behavior
-            
-            //bounce off of top and bottom
-            if (this.y < 0){
-                this.setDY(this.dy * -1);
+            function Ball() {
+                //class definition for ball
+                tBall = new Sprite(scene, "redBall.png", 20, 20);
+
+                tBall.timesHit = 0;
+
+                tBall.checkBounce = function (paddle) {
+                    //responds to a collision with the given paddle
+                    //Max and min dy 
+                    MAX = 10;
+                    if (this.collidesWith(paddle)) {
+                        this.timesHit++;
+                        this.setDX(this.dx * -1);
+
+                        dy = this.y - paddle.y;
+                        dy = ((dy / paddle.height) * 2);
+                        //console.log("dy: " + dy);
+                        dy *= MAX;
+                        this.setDY(dy);
+                    } // end if
+                }; // end checkBounce
+
+                tBall.checkBounds = function () {
+                    //overwrite checkbounds function to give
+                    //custom behavior
+
+                    //bounce off of top and bottom
+                    if (this.y < 0) {
+                        this.setDY(this.dy * -1);
+                    }
+                    if (this.y > scene.height) {
+                        this.setDY(this.dy * -1);
+                    }
+
+                    //wrap off of sides
+                    if (this.x < 0) {
+                        this.setPosition(scene.width - 150, this.y);
+                        if (paddlePlayer.lives > 1) {
+                            paddlePlayer.lives--;
+                            paddleComp.score += (Math.floor(ball.timesHit / 10) + 1);
+                            ball.timesHit = 0;
+                        } else {
+                            gameOver();
+                        }
+                        //computer scores
+                    } // end if
+                    if (this.x > scene.width) {
+                        this.setPosition(150, this.y);
+                        if (paddleComp.lives > 1) {
+                            paddleComp.lives--;
+                            paddlePlayer.score += (Math.floor(ball.timesHit / 10) + 1);
+                            ball.timesHit = 0;
+                        } else {
+                            gameOver();
+                        }
+                        //player scores
+                    } // end if
+                } // end checkBounds
+
+                return tBall;
             }
-            if (this.y > scene.height){
-                this.setDY(this.dy * -1);
-            }
-            
-            //wrap off of sides
-            if(this.x < 0){
-                this.setPosition(scene.width - 150, this.y);
-                //computer scores
-            } // end if
-            if (this.x > scene.width){
-                this.setPosition(150, this.y);
-                //player scores
-            } // end if
-        } // end checkBounds
-        
-        return tBall;
-    } // end Ball def
-    
-    function Paddle(){
-        //class definition for paddle
-        V_SPEED = 10;
-        BRAINS = .7 //percentage likelihood paddle will move each turn
-        tPaddle = new Sprite(scene, "paddleV.png", 10, 50);
-        
-        tPaddle.followMouse = function(){
-            //follows mouse for player control
-            this.setImgAngle(90);
-            this.setPosition(this.x, scene.getMouseY());
-        } // end followMouse method
-        
-        tPaddle.autoMove = function(){
-            //automatically moves
-            this.setImgAngle(90);
-            
-            //don't move on every turn
-            if (Math.random() < BRAINS){
-                if (this.y > ball.y){
-                  this.setMoveAngle(0);
+            ; // end Ball def
+
+            function Paddle() {
+                //class definition for paddle
+                V_SPEED = 10;
+                //BRAINS = percentage likelihood paddle will move each turn
+                if (difficultyChoice === 0) {
+                    BRAINS = .3;
+                } else if (difficultyChoice === 1) {
+                    BRAINS = .5;
+                } else if (difficultyChoice === 2) {
+                    BRAINS = .7;
                 } else {
-                    this.setMoveAngle(180);
-                } // end if
+                    BRAINS = 1;
+                }
+                tPaddle = new Sprite(scene, "paddleV.png", 10, 50);
+                tPaddle.lives = 3;
+                tPaddle.score = 0;
 
-                this.setSpeed(V_SPEED);
-            } // end if
-        } // end autoMove
-        
-        return tPaddle;
-    }
-    
-    function init(){
-        scene = new Scene();
-        scene.setBG("black");
-        scene.hideCursor();
-        ball = new Ball();
-    
-        paddlePlayer = new Paddle();
-        paddlePlayer.setPosition(100, 100);
-        paddlePlayer.setMoveAngle(0);
-        
-        paddleComp = new Paddle();
-        paddleComp.setPosition(700, 100);
-        paddleComp.setMoveAngle(180);
-    
-        scene.start();
-    } // end init
-    
-    function update(){
-        scene.clear();
-        //ball.checkScore();
+                tPaddle.followMouse = function () {
+                    //follows mouse for player control
+                    this.setImgAngle(90);
+                    this.setPosition(this.x, scene.getMouseY());
+                }; // end followMouse method
 
-        paddlePlayer.followMouse();
-        paddleComp.autoMove();
+                tPaddle.autoMove = function () {
+                    //automatically moves
+                    this.setImgAngle(90);
 
-        ball.checkBounce(paddlePlayer);
-        ball.checkBounce(paddleComp);
-        //updateScore();        
-        ball.update();
+                    //don't move on every turn
+                    if (Math.random() < BRAINS) {
+                        if (this.y > ball.y) {
+                            this.setMoveAngle(0);
+                        } else {
+                            this.setMoveAngle(180);
+                        } // end if
 
+                        this.setSpeed(V_SPEED);
+                    } // end if
+                } // end autoMove
 
-        paddlePlayer.update();
-        paddleComp.update();
-    
-    } // end update
-    
-    </script>
-</head>
-<body onload = "init()">
-</body>
+                return tPaddle;
+            }
+            ; // end paddle def
+
+            function init() {
+                scene = new Scene();
+                scene.setBG("black");
+                scene.hideCursor();
+
+                if (backgroundChoice !== 0) {
+                    if (backgroundChoice === 1) {
+                        background = new Sprite(scene, "sandBackground.png", 800, 600);
+                    }
+                    else {
+                        background = new Sprite(scene, "snowBackground.png", 800, 600);
+                    }
+                    background.setPosition(400, 300);
+                    background.dx = 0;
+                }
+
+                ball = new Ball();
+
+                paddlePlayer = new Paddle();
+                paddlePlayer.setPosition(100, 100);
+                paddlePlayer.setMoveAngle(0);
+
+                paddleComp = new Paddle();
+                paddleComp.setPosition(700, 100);
+                paddleComp.setMoveAngle(180);
+
+                scene.start();
+            }
+            ; // end init
+
+            function updateScore() {
+                var output = "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "<br>";
+                output += "Player Lives: " + paddlePlayer.lives + " | Computer Lives: " + paddleComp.lives + "<br>";
+                output += "Current Rally: " + ball.timesHit + " | Points Yielded: " + (Math.floor(ball.timesHit / 10) + 1);
+                document.getElementById("stats").innerHTML = output;
+            }
+            ; // end updateScore
+
+            function gameOver() {
+                alert("game over");
+                location.reload();
+            }
+            ;
+
+            function update() {
+                scene.clear();
+                //ball.checkScore();
+                if (backgroundChoice !== 0) {
+                    background.update();
+                }
+                paddlePlayer.followMouse();
+                paddleComp.autoMove();
+
+                ball.checkBounce(paddlePlayer);
+                ball.checkBounce(paddleComp);
+                updateScore();
+                ball.update();
+
+                paddlePlayer.update();
+                paddleComp.update();
+
+            }; // end update
+
+        </script>
+        <style type="text/css">
+            #stats {
+                position: absolute;
+                font-family: monospace;
+                left: 310px;
+                top: 25px;
+                z-index: 999;
+                color: white;
+            }
+        </style>
+    </head>
+    <body onload = "init()">
+        <div id = "stats"></div>
+    </body>
 </html>
+
