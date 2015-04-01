@@ -3,106 +3,127 @@
     <head>
         <meta charset="UTF-8">
         <title>pong.html</title>
-        <script type="text/javascript"
-        src = "simpleGame.js"></script>
-        <script type="text/javascript">
-            var scene;
-            var ball;
-            var paddlePlayer;
-            var paddleComp;
-            var difficultyChoice = 0; // 0 = easy | 1 = medium | 2 = hard | 3 = insane
-            var numberOfLivesChoice = 0; // 0 = 0 | 1 = 3 | 2 = 5
-            var backgroundChoice = 0; //0 = black | 1 = sand | 2 = snow
-            var background;
-            var joy = new Joy();
+    <audio id="pingSound" src="pingSound.mp3" preload="auto"></audio>
+    <audio id="playerScore" src="playerScore.mp3" preload="auto"></audio>
+    <audio id="compScore" src="compScore.mp3" preload="auto"></audio>
+    <audio id="gameOver" src="gameOver.mp3" preload="auto"></audio>
+    <script type="text/javascript" src = "simpleGame.js"></script>
+    <script type="text/javascript">
+        var scene;
+        var ball;
+        var paddlePlayer;
+        var paddleComp;
+        var background;
+        var joy = new Joy();
 
-            function Ball() {
-                //class definition for ball
-                tBall = new Sprite(scene, "redBall.png", 20, 20);
+        function Ball() {
+            //class definition for ball
+            tBall = new Sprite(scene, "redBall.png", 20, 20);
 
-                tBall.timesHit = 0;
+            tBall.timesHit = 0;
 
-                tBall.checkBounce = function (paddle) {
-                    //responds to a collision with the given paddle
-                    //Max and min dy 
-                    MAX = 10;
-                    if (this.collidesWith(paddle)) {
-                        this.timesHit++;
-                        this.setDX(this.dx * -1);
+            tBall.checkBounce = function (paddle) {
+                //responds to a collision with the given paddle
+                //Max and min dy 
+                MAX = 10;
+                if (this.collidesWith(paddle)) {
 
-                        dy = this.y - paddle.y;
-                        dy = ((dy / paddle.height) * 2);
-                        //console.log("dy: " + dy);
-                        dy *= MAX;
-                        this.setDY(dy);
-                    } // end if
-                }; // end checkBounce
 
-                tBall.checkBounds = function () {
-                    //overwrite checkbounds function to give
-                    //custom behavior
+                    document.getElementById('pingSound').play();
 
-                    //bounce off of top and bottom
-                    if (this.y < 0) {
-                        this.setDY(this.dy * -1);
-                    }
-                    if (this.y > scene.height) {
-                        this.setDY(this.dy * -1);
-                    }
+                    this.timesHit++;
+                    this.setDX(this.dx * -1);
 
-                    //wrap off of sides
-                    if (this.x < 0) {
-                        this.setPosition(scene.width - 150, this.y);
-                        if (paddlePlayer.lives > 1) {
-                            paddlePlayer.lives--;
-                            paddleComp.score += (Math.floor(ball.timesHit / 10) + 1);
-                            ball.timesHit = 0;
-                        } else {
-                            gameOver();
-                        }
-                        //computer scores
-                    } // end if
-                    if (this.x > scene.width) {
-                        this.setPosition(150, this.y);
-                        if (paddleComp.lives > 1) {
-                            paddleComp.lives--;
-                            paddlePlayer.score += (Math.floor(ball.timesHit / 10) + 1);
-                            ball.timesHit = 0;
-                        } else {
-                            gameOver();
-                        }
-                        //player scores
-                    } // end if
-                } // end checkBounds
+                    dy = this.y - paddle.y;
+                    dy = ((dy / paddle.height) * 2);
+                    //console.log("dy: " + dy);
+                    dy *= MAX;
+                    this.setDY(dy);
+                } // end if
+            }; // end checkBounce
 
-                return tBall;
-            }
-            ; // end Ball def
+            tBall.checkBounds = function () {
+                //overwrite checkbounds function to give
+                //custom behavior
 
-            function Paddle() {
-                //class definition for paddle
-                V_SPEED = 10;
-                //BRAINS = percentage likelihood paddle will move each turn
-                if (difficultyChoice === 0) {
-                    BRAINS = .3;
-                } else if (difficultyChoice === 1) {
-                    BRAINS = .5;
-                } else if (difficultyChoice === 2) {
-                    BRAINS = .7;
-                } else {
-                    BRAINS = 1;
+                //bounce off of top and bottom
+                if (this.y < 0) {
+                    this.setDY(this.dy * -1);
                 }
-                tPaddle = new Sprite(scene, "paddleV.png", 10, 50);
-                tPaddle.lives = 3;
-                tPaddle.score = 0;
+                if (this.y > scene.height) {
+                    this.setDY(this.dy * -1);
+                }
 
-                tPaddle.followMouse = function () {
-                    //follows mouse for player control
-                    this.setImgAngle(90);
-                    this.setPosition(this.x, scene.getMouseY());
-                }; // end followMouse method
+                //wrap off of sides
+                if (this.x < 0) {
+                    this.setPosition(scene.width - 150, this.y);
+                    if (paddlePlayer.lives > 1) {
+                        document.getElementById('compScore').play();
+                        paddlePlayer.lives--;
+                        paddleComp.score += (Math.floor(ball.timesHit / 10) + 1);
+                        ball.timesHit = 0;
+                    } else {
+                        gameOver();
+                    }
+                    //computer scores
+                } // end if
+                if (this.x > scene.width) {
+                    this.setPosition(150, this.y);
+                    if (paddleComp.lives > 1) {
+                        document.getElementById('playerScore').play();
+                        paddleComp.lives--;
+                        paddlePlayer.score += (Math.floor(ball.timesHit / 10) + 1);
+                        ball.timesHit = 0;
+                    } else {
+                        gameOver();
+                    }
+                    //player scores
+                } // end if
+            } // end checkBounds
 
-                tPaddle.autoMove = function () {
+            return tBall;
+        }
+        ; // end Ball def
+
+        function Paddle() {
+
+            //class definition for paddle
+            V_SPEED = 10;
+            //BRAINS = percentage likelihood paddle will move each turn
+
+            var difficultyChoiceForm = document.getElementById('difficultyChoiceForm');
+
+            for (var temp = 0; temp < difficultyChoiceForm.length; temp++) {
+                if (difficultyChoiceForm[temp].checked) {
+                    BRAINS = difficultyChoiceForm[temp].value;
+                    break;
+                }
+            }
+
+            tPaddle = new Sprite(scene, "paddleV.png", 10, 50);
+
+            var livesChoiceForm = document.getElementById('livesChoiceForm');
+
+            for (var temp = 0; temp < livesChoiceForm.length; temp++) {
+                if (livesChoiceForm[temp].checked) {
+                    tPaddle.lives = livesChoiceForm[temp].value;
+                    break;
+                }
+            }
+
+            tPaddle.score = 0;
+
+            tPaddle.followMouse = function () {
+                //follows mouse for player control
+                this.setImgAngle(90);
+                this.setPosition(this.x, scene.getMouseY());
+            }; // end followMouse method
+
+            tPaddle.autoMove = function () {
+
+                if (BRAINS === "7") {
+                    this.y = ball.y;
+                } else {
                     //automatically moves
                     this.setImgAngle(90);
 
@@ -117,88 +138,127 @@
                         this.setSpeed(V_SPEED);
                     } // end if
                 } // end autoMove
-
-                return tPaddle;
             }
-            ; // end paddle def
+            return tPaddle;
+        }
+        ; // end paddle def
 
-            function init() {
-                scene = new Scene();
-                scene.setBG("black");
-                scene.hideCursor();
+        function init() {
+            scene = new Scene();
+            scene.setBG("black");
 
-                if (backgroundChoice !== 0) {
-                    if (backgroundChoice === 1) {
+            ball = new Ball();
+        }
+        ; // end init
+
+        function startGame() {
+
+            document.getElementById('stats').style.left = "270px";
+            scene.hideCursor();
+            var backgroundChoiceForm = document.getElementById('backgroundChoiceForm');
+
+            for (var temp = 0; temp < backgroundChoiceForm.length; temp++) {
+                if (backgroundChoiceForm[temp].checked) {
+                    if (backgroundChoiceForm[temp].value === "1") {
                         background = new Sprite(scene, "sandBackground.png", 800, 600);
-                    }
-                    else {
+                    } else if (backgroundChoiceForm[temp].value === "2") {
                         background = new Sprite(scene, "snowBackground.png", 800, 600);
+                    } else {
+                        break;
                     }
                     background.setPosition(400, 300);
                     background.dx = 0;
+                    break;
+
                 }
-
-                ball = new Ball();
-
-                paddlePlayer = new Paddle();
-                paddlePlayer.setPosition(100, 100);
-                paddlePlayer.setMoveAngle(0);
-
-                paddleComp = new Paddle();
-                paddleComp.setPosition(700, 100);
-                paddleComp.setMoveAngle(180);
-
-                scene.start();
             }
-            ; // end init
 
-            function updateScore() {
-                var output = "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "<br>";
-                output += "Player Lives: " + paddlePlayer.lives + " | Computer Lives: " + paddleComp.lives + "<br>";
-                output += "Current Rally: " + ball.timesHit + " | Points Yielded: " + (Math.floor(ball.timesHit / 10) + 1);
-                document.getElementById("stats").innerHTML = output;
+            paddlePlayer = new Paddle();
+            paddlePlayer.setPosition(100, 100);
+            paddlePlayer.setMoveAngle(0);
+
+            paddleComp = new Paddle();
+            paddleComp.setPosition(700, 100);
+            paddleComp.setMoveAngle(180);
+
+            scene.start();
+        }
+        ;
+
+        function updateScore() {
+            var output = "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "<br>";
+            output += "Player Lives: " + paddlePlayer.lives + " | Computer Lives: " + paddleComp.lives + "<br>";
+            output += "Current Rally: " + ball.timesHit + " | Points Yielded: " + (Math.floor(ball.timesHit / 10) + 1);
+            document.getElementById("stats").innerHTML = output;
+        }
+        ; // end updateScore
+
+        function gameOver() {
+            document.getElementById('gameOver').play();
+            alert("game over");
+            location.reload();
+        }
+        ;
+
+        function update() {
+            scene.clear();
+            //ball.checkScore();
+            if (typeof background !== 'undefined') {
+                background.update();
             }
-            ; // end updateScore
+            paddlePlayer.followMouse();
+            paddleComp.autoMove();
 
-            function gameOver() {
-                alert("game over");
-                location.reload();
-            }
-            ;
+            ball.checkBounce(paddlePlayer);
+            ball.checkBounce(paddleComp);
+            updateScore();
+            ball.update();
 
-            function update() {
-                scene.clear();
-                //ball.checkScore();
-                if (backgroundChoice !== 0) {
-                    background.update();
-                }
-                paddlePlayer.followMouse();
-                paddleComp.autoMove();
+            paddlePlayer.update();
+            paddleComp.update();
 
-                ball.checkBounce(paddlePlayer);
-                ball.checkBounce(paddleComp);
-                updateScore();
-                ball.update();
+        }
+        ; // end update
 
-                paddlePlayer.update();
-                paddleComp.update();
+    </script>
+    <style type="text/css">
+        #stats {
+            position: absolute;
+            font-family: monospace;
+            left: 210px;
+            top: 25px;
+            z-index: 999;
+            color: white;
+        }
+    </style>
+</head>
+<body onload = "init()">
 
-            }; // end update
-
-        </script>
-        <style type="text/css">
-            #stats {
-                position: absolute;
-                font-family: monospace;
-                left: 310px;
-                top: 25px;
-                z-index: 999;
-                color: white;
-            }
-        </style>
-    </head>
-    <body onload = "init()">
-        <div id = "stats"></div>
-    </body>
+    <div id = "stats">
+        <center>
+            <form id="livesChoiceForm">
+                <label for="lives">Number of Lives: </label>
+                <input type="radio" name="lives" value="0" checked> 0
+                <input type="radio" name="lives" value="3"> 3
+                <input type="radio" name="lives" value="5"> 5
+            </form>
+            <form id="difficultyChoiceForm">
+                <label for="difficulty">Difficulty: </label>
+                <input type="radio" name="difficulty" value="0.3" checked> Easy
+                <input type="radio" name="difficulty" value="0.5"> Medium
+                <input type="radio" name="difficulty" value="0.7"> Hard
+                <input type="radio" name="difficulty" value="1"> Insane
+                <input type="radio" name="difficulty" value="7"> God
+            </form>
+            <form id="backgroundChoiceForm">
+                <label for="background">Background: </label>
+                <input type="radio" name="background" value="0" checked> Black
+                <input type="radio" name="background" value="1"> Sand
+                <input type="radio" name="background" value="2"> Snow
+            </form>
+            <button onclick="startGame()">Start Game</button><br>
+        </center>
+    </div>
+</body>
 </html>
 
