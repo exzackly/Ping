@@ -27,8 +27,6 @@
                 //Max and min dy 
                 MAX = 10;
                 if (this.collidesWith(paddle)) {
-
-
                     document.getElementById('pingSound').play();
 
                     this.timesHit++;
@@ -63,7 +61,7 @@
                         paddleComp.score += (Math.floor(ball.timesHit / 10) + 1);
                         ball.timesHit = 0;
                     } else {
-                        gameOver();
+                        gameOver(paddleComp);
                     }
                     //computer scores
                 } // end if
@@ -75,15 +73,14 @@
                         paddlePlayer.score += (Math.floor(ball.timesHit / 10) + 1);
                         ball.timesHit = 0;
                     } else {
-                        gameOver();
+                        gameOver(paddlePlayer);
                     }
                     //player scores
                 } // end if
             } // end checkBounds
 
             return tBall;
-        }
-        ; // end Ball def
+        }; // end Ball def
 
         function Paddle() {
 
@@ -140,16 +137,14 @@
                 } // end autoMove
             }
             return tPaddle;
-        }
-        ; // end paddle def
+        }; // end paddle def
 
         function init() {
             scene = new Scene();
             scene.setBG("black");
 
             ball = new Ball();
-        }
-        ; // end init
+        }; // end init
 
         function startGame() {
 
@@ -169,7 +164,6 @@
                     background.setPosition(400, 300);
                     background.dx = 0;
                     break;
-
                 }
             }
 
@@ -181,24 +175,43 @@
             paddleComp.setPosition(700, 100);
             paddleComp.setMoveAngle(180);
 
+            var difficultyChoiceForm = document.getElementById('difficultyChoiceForm');
+
+            for (var temp = 0; temp < difficultyChoiceForm.length; temp++) {
+                if (difficultyChoiceForm[temp].checked) {
+                    if (difficultyChoiceForm[temp].value == "0.6") {
+                        ball.setSpeed(12);
+                    }
+                    else if (difficultyChoiceForm[temp].value == "0.8") {
+                        ball.setSpeed(16);
+                    }
+                    else if (difficultyChoiceForm[temp].value == "1") {
+                        ball.setSpeed(18);
+                    }
+                    else if (difficultyChoiceForm[temp].value == "7") {
+                        ball.setSpeed(20);
+                    }
+                    break;
+                }
+            }
             scene.start();
-        }
-        ;
+        };
 
         function updateScore() {
             var output = "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "<br>";
             output += "Player Lives: " + paddlePlayer.lives + " | Computer Lives: " + paddleComp.lives + "<br>";
             output += "Current Rally: " + ball.timesHit + " | Points Yielded: " + (Math.floor(ball.timesHit / 10) + 1);
             document.getElementById("stats").innerHTML = output;
-        }
-        ; // end updateScore
+        }; // end updateScore
 
-        function gameOver() {
+        function gameOver(winner) {
             document.getElementById('gameOver').play();
-            alert("game over");
+            var output = winner === paddlePlayer ? "Game Over! You Win!\n" : "Game Over! You Lose...\n";
+            output += "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "\n";
+            output += "Final Rally: " + ball.timesHit;
+            alert(output);
             location.reload();
-        }
-        ;
+        };
 
         function update() {
             scene.clear();
@@ -217,8 +230,7 @@
             paddlePlayer.update();
             paddleComp.update();
 
-        }
-        ; // end update
+        }; // end update
 
     </script>
     <style type="text/css">
@@ -238,15 +250,15 @@
         <center>
             <form id="livesChoiceForm">
                 <label for="lives">Number of Lives: </label>
-                <input type="radio" name="lives" value="0" checked> 0
+                <input type="radio" name="lives" value="0"> 0
                 <input type="radio" name="lives" value="3"> 3
-                <input type="radio" name="lives" value="5"> 5
+                <input type="radio" name="lives" value="5" checked> 5
             </form>
             <form id="difficultyChoiceForm">
                 <label for="difficulty">Difficulty: </label>
-                <input type="radio" name="difficulty" value="0.3" checked> Easy
-                <input type="radio" name="difficulty" value="0.5"> Medium
-                <input type="radio" name="difficulty" value="0.7"> Hard
+                <input type="radio" name="difficulty" value="0.4" checked> Easy
+                <input type="radio" name="difficulty" value="0.6"> Medium
+                <input type="radio" name="difficulty" value="0.8"> Hard
                 <input type="radio" name="difficulty" value="1"> Insane
                 <input type="radio" name="difficulty" value="7"> God
             </form>
