@@ -86,21 +86,23 @@
 
             //class definition for paddle
             V_SPEED = 10;
-            //BRAINS = percentage likelihood paddle will move each turn
-
+                        
+            
             var difficultyChoiceForm = document.getElementById('difficultyChoiceForm');
-
+            //sets BRAINS from user selection
+            //percentage likelihood paddle will move each turn
             for (var temp = 0; temp < difficultyChoiceForm.length; temp++) {
                 if (difficultyChoiceForm[temp].checked) {
                     BRAINS = difficultyChoiceForm[temp].value;
                     break;
+                   
                 }
             }
 
             tPaddle = new Sprite(scene, "paddleV.png", 10, 50);
 
             var livesChoiceForm = document.getElementById('livesChoiceForm');
-
+            //sets lives from user selection 
             for (var temp = 0; temp < livesChoiceForm.length; temp++) {
                 if (livesChoiceForm[temp].checked) {
                     tPaddle.lives = livesChoiceForm[temp].value;
@@ -117,7 +119,8 @@
             }; // end followMouse method
 
             tPaddle.autoMove = function () {
-
+                //moves opponent's paddle
+                //based on balls y coordinate
                 if (BRAINS === "7") {
                     this.y = ball.y;
                 } else {
@@ -151,7 +154,7 @@
             document.getElementById('stats').style.left = "270px";
             scene.hideCursor();
             var backgroundChoiceForm = document.getElementById('backgroundChoiceForm');
-
+             //sets background from user selection
             for (var temp = 0; temp < backgroundChoiceForm.length; temp++) {
                 if (backgroundChoiceForm[temp].checked) {
                     if (backgroundChoiceForm[temp].value === "1") {
@@ -176,7 +179,7 @@
             paddleComp.setMoveAngle(180);
 
             var difficultyChoiceForm = document.getElementById('difficultyChoiceForm');
-
+            //sets difficulty from user selection
             for (var temp = 0; temp < difficultyChoiceForm.length; temp++) {
                 if (difficultyChoiceForm[temp].checked) {
                     if (difficultyChoiceForm[temp].value == "0.6") {
@@ -206,10 +209,12 @@
 
         function gameOver(winner) {
             document.getElementById('gameOver').play();
+            //generates output message based on game winner 
             var output = winner === paddlePlayer ? "Game Over! You Win!\n" : "Game Over! You Lose...\n";
             output += "Player Score: " + paddlePlayer.score + " | Computer Score: " + paddleComp.score + "\n";
             output += "Final Rally: " + ball.timesHit;
             alert(output);
+            //restarts game via refreshing webpage 
             location.reload();
         };
 
@@ -247,6 +252,7 @@
 <body onload = "init()">
 
     <div id = "stats">
+        <!--creates settings-->
         <center>
             <form id="livesChoiceForm">
                 <label for="lives">Number of Lives: </label>
