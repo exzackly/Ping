@@ -2,7 +2,8 @@
 <html lang="en-US">
     <head>
         <meta charset="UTF-8">
-        <title>pong.html</title>
+        <title>Pong</title>
+    <audio id="backgroundMusic" src="backgroundMusic.mp3" preload="auto"></audio>
     <audio id="pingSound" src="pingSound.mp3" preload="auto"></audio>
     <audio id="playerScore" src="playerScore.mp3" preload="auto"></audio>
     <audio id="compScore" src="compScore.mp3" preload="auto"></audio>
@@ -20,6 +21,7 @@
             //class definition for ball
             tBall = new Sprite(scene, "redBall.png", 20, 20);
 
+            //current rally
             tBall.timesHit = 0;
 
             tBall.checkBounce = function (paddle) {
@@ -34,7 +36,6 @@
 
                     dy = this.y - paddle.y;
                     dy = ((dy / paddle.height) * 2);
-                    //console.log("dy: " + dy);
                     dy *= MAX;
                     this.setDY(dy);
                 } // end if
@@ -86,8 +87,8 @@
 
             //class definition for paddle
             V_SPEED = 10;
-                        
-            
+
+
             var difficultyChoiceForm = document.getElementById('difficultyChoiceForm');
             //sets BRAINS from user selection
             //percentage likelihood paddle will move each turn
@@ -95,7 +96,7 @@
                 if (difficultyChoiceForm[temp].checked) {
                     BRAINS = difficultyChoiceForm[temp].value;
                     break;
-                   
+
                 }
             }
 
@@ -145,16 +146,16 @@
         function init() {
             scene = new Scene();
             scene.setBG("black");
-
             ball = new Ball();
         }; // end init
 
         function startGame() {
-
             document.getElementById('stats').style.left = "270px";
+            document.getElementById('backgroundMusic').play();
+            window.setInterval(function () {document.getElementById('backgroundMusic').play();}, 1);
             scene.hideCursor();
             var backgroundChoiceForm = document.getElementById('backgroundChoiceForm');
-             //sets background from user selection
+            //sets background from user selection
             for (var temp = 0; temp < backgroundChoiceForm.length; temp++) {
                 if (backgroundChoiceForm[temp].checked) {
                     if (backgroundChoiceForm[temp].value === "1") {
@@ -250,12 +251,11 @@
     </style>
 </head>
 <body onload = "init()">
-
     <div id = "stats">
         <!--creates settings-->
         <center>
             <form id="livesChoiceForm">
-                <label for="lives">Number of Lives: </label>
+                <label for="lives">Number of Extra Lives: </label>
                 <input type="radio" name="lives" value="0"> 0
                 <input type="radio" name="lives" value="3"> 3
                 <input type="radio" name="lives" value="5" checked> 5

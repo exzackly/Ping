@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>Pong</title>
+    </head>
+    <body>
+        <style>
+            .button{text-decoration:none; text-align:center; 
+                    padding:11px 32px; 
+                    border:solid 1px #a39d50; 
+                    -webkit-border-radius:4px;
+                    -moz-border-radius:4px; 
+                    border-radius: 4px; 
+                    font:18px Arial, Helvetica, sans-serif; 
+                    font-weight:bold; 
+                    color:#e5ffff; 
+                    background:#d5cd5f; 
+                    -webkit-box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff; 
+                    -moz-box-shadow: 0px 0px 2px #bababa,  inset 0px 0px 1px #ffffff;  
+                    box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff;  
+            }
+            .button:hover{
+                background:#C0B856;
+            }
+
+        </style>
+        <script>
+            var instructions = "<center><img src=\"splashTitle.png\" style=\"height: 30%; width: 30%\"/><br><br>Use the mouse to control the paddle<br><br>The goal is to get the ball past the opponent's paddle<br><br>For every 10 successful rallies, the winner of the game is yielded 1 extra point<br><br>Choose between 0, 3, or 5 extra lives<br><br>As selected difficulty level increases, the skill of the opponent and the speed of the ball increase as well.<br><br>Select preferred background design<br><br><img src=\"splashNames.png\" style=\"height: 60%; width: 60%\"/><br><br><a href=\"#\" onclick=\"loadGame()\" class=\"button\">Start Game</a><br><br><br></center>"
+
+            var showInstructions = function () {
+                document.getElementById("stats").innerHTML = instructions;
+            }
+
+            var loadGame = function () {
+                window.location.assign("pong.html");
+            }
+        </script>
+
+        <div id = "stats">
+            <center>
+                <img src="splashTitle.png" style="height: 20%; width: 20%"/>
+                <br>
+                <img src="splashBackground.png" />
+                <br>
+                <img src="splashNames.png" style="height: 60%; width: 60%"/>
+                <br><br>
+                <a href="#" onclick="loadGame()" class="button">Start Game</a><br><br><br>
+                <a href="#" onclick="showInstructions()" class="button">Show Instructions</a><br>
+            </center>
+        </div>
+
+
+    </body>
+</html>
+
