@@ -61,6 +61,7 @@
                         paddlePlayer.lives--;
                         paddleComp.score += (Math.floor(ball.timesHit / 10) + 1);
                         ball.timesHit = 0;
+                        ball.dy = 0;
                     } else {
                         gameOver(paddleComp);
                     }
@@ -73,6 +74,7 @@
                         paddleComp.lives--;
                         paddlePlayer.score += (Math.floor(ball.timesHit / 10) + 1);
                         ball.timesHit = 0;
+                        ball.dy = 0;
                     } else {
                         gameOver(paddlePlayer);
                     }
